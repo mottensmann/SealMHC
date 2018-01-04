@@ -1,0 +1,14 @@
+"Query" "Allele" "Similarity" "Length" "Mismatches" "Gaps"
+"intestine.129280" "ArGa-DQB*11" 100 181 0 0
+"intestine.149923" "ArGa-DQB*11" 99.45 181 0 1
+"kidney.71966" "ArGa-DQB*5" 99.45 181 0 1
+"kidney.109366" "ArGa-DQB*11" 100 181 0 0
+"kidney.149931" "ArGa-DQB*4" 99.45 182 0 1
+"lung.129975" "ArGa-DQB*11" 98.36 183 0 3
+"spleen.113201" "ArGa-DQB*2" 100 181 0 0
+"spleen.139552" "ArGa-DQB*1" 100 181 0 0
+"spleen.143842" "ArGa-DQB*11" 98.9 181 0 2
+"spleen.146339" "ArGa-DQB*11" 100 181 0 0
+"spleen.147317" "ArGa-DQB*1" 100 181 0 0
+"spleen.243607" "ArGa-DQB*11" 100 181 0 0
+"testis.24103" "ArGa-DQB*4" 98.36 183 0 3
