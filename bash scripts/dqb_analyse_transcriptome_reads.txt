@@ -1,0 +1,37 @@
+cd /mnt/c/Users/MOMO/Documents/GitHub/ArcGazMhcII/DQB
+export PATH="/mnt/c/Users/MOMO/Documents/GitHub/ArcGazMhcII/linux/sra/bin:$PATH"
+
+## get genbank archieves
+## ---------------------
+
+## Load 454 raw reads from Hoffman et al 2013: Transcriptome of the dead
+## ---------------------------------------------------------------------
+
+vdb-dump -f tab -C READ SRR646623 | awk '{print ">" "heart." NR "\n" $0}' > heart.SRA064103.fasta &
+vdb-dump -f tab -C READ SRR646624 | awk '{print ">" "intestine." NR "\n" $0}' > intestine.SRA064103.fasta & 
+vdb-dump -f tab -C READ SRR646625 | awk '{print ">" "kidney." NR "\n" $0}' > kidney.SRA064103.fasta &
+vdb-dump -f tab -C READ SRR646626 | awk '{print ">" "lung." NR "\n" $0}' > lung.SRA064103.fasta &
+vdb-dump -f tab -C READ SRR646627 | awk '{print ">" "spleen." NR "\n" $0}' > spleen.SRA064103.fasta &
+vdb-dump -f tab -C READ SRR646628 | awk '{print ">" "testis." NR "\n" $0}' > testis.SRA064103.fasta &
+
+## Merge files
+## -----------
+cat *.SRA064103.fasta > transcriptome_reads.fasta
+
+## Dereplicate alleles:
+## arga_dqb.fasta contains putatitive alleles 'ArGa-DQB*NN', putatitive artefacts 'ArGa-DQB**NN' and likely artefacts 'ArGa-DQB***NN'
+## ----------------------------------------------------------------------------------------------------------------------------------
+usearch10.exe -fastx_uniques arga_dqb.fasta -fastaout arga_dqb_uniques.fasta
+
+## Remove size annotation
+## ######################
+usearch10.exe -fastx_strip_annots arga_dqb_uniques.fasta -fastaout arga_dqb_derep.fasta
+
+## make blast database from allele sequences
+## -----------------------------------------
+makeblastdb -in arga_dqb_derep.fasta -dbtype nucl -out arga_dqb_db
+
+## Blast 454 reads to alleles
+## --------------------------
+blastn -db arga_dqb_db -outfmt 6 -num_threads 8 -evalue 1e-8 -word_size 7 -query transcriptome_reads.fasta -out transcriptome_reads.arga_dqb.txt &
+

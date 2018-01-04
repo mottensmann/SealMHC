@@ -1,0 +1,106 @@
+######################################################################################################
+##### Prerequisites																				######
+##### -------------																				######
+##### mhc_cluster needs to be downloded from https://github.com/mottensmann/mhc_cluster			######
+##### Vsearch v.2.44, hmmer-3.1b2, usearch10, muscle3.8.31 have to be included in the PATH 		######	
+##### If they are not included, make them accessible by adding them to the PATH using the 		######
+##### following notation, where '~' gives the path starting from the root.						######
+##### Example: 																					######
+#####			export PATH="~/mhc_cluster:$PATH"												######
+##### Additionally a QIIME environment is required (see http://qiime.org/install/install.html)	######
+##### Here, QIIME is assumed to be part of the conda environment								######
+#####																							######
+##### Raw reads may be downloaded as zip archieves and saved in a subfolder raw_reads   		######
+######################################################################################################
+
+## Start conda
+## -----------
+source activate qiime191conda
+
+## Set directory
+## -------------
+cd miseq_reads/DRB-Pool/
+
+## MUSCLE alignment of drb sequences
+## ---------------------------------
+muscle -in hmm/seal_drb.fasta -out hmm/seal_drb.afa ;
+
+## create hidden markov model
+## --------------------------
+hmmbuild hmm/seal_drb.hmm hmm/seal_drb.afa ;
+
+## create auxilariy files for hmmscan
+## ----------------------------------
+hmmpress hmm/seal_drb.hmm ;
+
+## copy to folder lib in repository mhc_cluster
+## --------------------------------------------
+cd hmm/
+find -name "seal_drb*" -print -exec cp {} ~/mhc_cluster/lib/ \;
+cd ..
+
+## Unzip raw reads
+## ---------------
+cd raw_reads
+find . -iname "*.gz" -exec gunzip {} \;
+cd ..
+
+## Extract and strip barcodes from reads 
+## --------------------------------------
+extract_barcodes.py --input_type barcode_paired_end -f raw_reads/reads1.fastq -r raw_reads/reads2.fastq --bc1_len 8 --bc2_len 8 -m drb_barcodes.txt -a -o parsed_barcodes/ ;
+
+## Due to unusually low quality of the secondary reads, all further analyses are only based on the information provided by the forwad reads
+## ----------------------------------------------------------------------------------------------------------------------------------------
+
+## Filter reads and truncate to 230 bp
+## -----------------------------------
+vsearch --fastq_filter parsed_barcodes/reads1.fastq -fastq_maxns 0 -fastqout parsed_barcodes/reads1_qual_filt.fastq -fastq_maxee 2 -fastq_trunclen 230
+
+## Filter reads 
+## ------------
+source("R/call_filter_forward_reads_drb.R")
+
+## Truncate filtered to get only exon sequences
+## --------------------------------------------
+fastx_trimmer -i parsed_barcodes/reads1_qual_filt_cont_filt.fastq -o parsed_barcodes/reads1_cluster_input.fastq -f 31 &
+
+## Run MHC clustering pipeline
+## ---------------------------
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/drb -u usearch10.exe -hmm seal_drb.hmm -pct '1.0' -minsize '10.0' -alpha '2.0' &
+
+## Explore sensitivity to parameter alpha
+## --------------------------------------
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.0' ;
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.5' ;
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.0' ;
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.5' ;
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.0' ;
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.5' ;
+cluster_mhc2.py -f parsed_barcodes/reads1_cluster_input.fastq -o clustered_reads/alpha_exploration/drb -hmm seal_drb.hmm -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '3.0' ;
+
+## Apply to samples individually
+## -----------------------------
+cd /demultiplexed/
+find . -type d | while read d; do
+   (cd $d/
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.0' ;
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.5' ;
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.0' ;
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.5' ;
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.0' ;
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.5' ;
+   cluster_mhc2.py -f read1.fastq -o temp -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '3.0' ;
+   )  
+done
+cd ../
+
+## Create reference based on individually identified otus
+## ------------------------------------------------------
+
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_3.0 -ref demultiplexed/temp_pct_1.0_a_3.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_2.5 -ref demultiplexed/temp_pct_1.0_a_2.5_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_2.0 -ref demultiplexed/temp_pct_1.0_a_2.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_1.5 -ref demultiplexed/temp_pct_1.0_a_1.5_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_1.0 -ref demultiplexed/temp_pct_1.0_a_1.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_0.5 -ref demultiplexed/temp_pct_1.0_a_0.5_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f parsed_barcodes/reads1_cluster_input.fastq -o reference_based/a_0.0 -ref demultiplexed/temp_pct_1.0_a_0.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;

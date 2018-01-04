@@ -1,0 +1,20 @@
+cd /mnt/c/Users/MOMO/Documents/GitHub/ArcGazMhcII/DRB
+export PATH="/mnt/c/Users/MOMO/Documents/GitHub/ArcGazMhcII/linux/sra/bin:$PATH"
+
+## Dereplicate alleles:
+## arga_drb.fasta contains putatitive alleles 'ArGa-DRB*NN', putatitive artefacts 'ArGa-DRB**NN' and likely artefacts 'ArGa-DRB***NN'
+## ----------------------------------------------------------------------------------------------------------------------------------
+usearch10.exe -fastx_uniques arga_drb.fasta -fastaout arga_drb_uniques.fasta
+
+## Remove size annotation
+## ######################
+usearch10.exe -fastx_strip_annots arga_drb_uniques.fasta -fastaout arga_drb_derep.fasta
+
+## make blast database from allele sequences
+## -----------------------------------------
+makeblastdb -in arga_drb_derep.fasta -dbtype nucl -out arga_drb_db
+
+## Blast 454 reads to alleles
+## --------------------------
+blastn -db arga_drb_db -outfmt 6 -num_threads 8 -evalue 1e-8 -word_size 7 -query transcriptome_reads.fasta -out transcriptome_reads.arga_drb.txt &
+

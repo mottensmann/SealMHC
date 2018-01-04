@@ -1,0 +1,110 @@
+######################################################################################################
+##### Prerequisites																				######
+##### -------------																				######
+##### mhc_cluster needs to be downloded from https://github.com/mottensmann/mhc_cluster			######
+##### Vsearch v.2.44, hmmer-3.1b2, usearch10, muscle3.8.31 have to be included in the PATH 		######	
+##### If they are not included, make them accessible by adding them to the PATH using the 		######
+##### following notation, where '~' gives the path starting from the root.						######
+##### Example: 																					######
+#####			export PATH="~/mhc_cluster:$PATH"												######
+##### Additionally a QIIME environment is required (see http://qiime.org/install/install.html)	######
+##### Here, QIIME is assumed to be part of the conda environment								######
+#####																							######
+##### Raw reads may be downloaded as zip archieves and saved in a subfolder raw_reads   		######
+######################################################################################################
+
+## Start conda
+## -----------
+source activate qiime191conda
+
+## Set directory
+## -------------
+cd miseq_reads/DQB-Pool/
+
+## MUSCLE alignment of dqb sequences
+## ---------------------------------
+muscle -in hmm/seal_dqb.fasta -out hmm/seal_dqb.afa ;
+
+## create hidden markov model
+## --------------------------
+hmmbuild hmm/seal_dqb.hmm hmm/seal_dqb.afa ;
+
+## create auxilariy files for hmmscan
+## ----------------------------------
+hmmpress hmm/seal_dqb.hmm ;
+
+## copy to folder lib in repository mhc_cluster
+## --------------------------------------------
+cd hmm/
+find -name "seal_dqb*" -print -exec cp {} ~/mhc_cluster/lib/ \;
+cd ..
+
+## Unzip raw reads
+## ---------------
+cd raw_reads
+find . -iname "*.gz" -exec gunzip {} \;
+cd ..
+
+## Extract and strip barcodes from reads 
+## --------------------------------------
+extract_barcodes.py --input_type barcode_paired_end -f raw_reads/reads1.fastq -r raw_reads/reads2.fastq --bc1_len 8 --bc2_len 8 -m dqb_barcodes.txt -a -o parsed_barcodes/ ;
+
+
+## Trim ends: Choosen length maximises the number of successfully merged reads
+## ---------------------------------------------------------------------------
+fastx_trimmer -i parsed_barcodes/reads1.fastq -o parsed_barcodes/reads1.fastq -l 239 &
+fastx_trimmer -i parsed_barcodes/reads2.fastq -o parsed_barcodes/reads2.fastq -l 242 &
+
+## Merge pairs of reads with vsearch
+## ---------------------------------
+vsearch --fastq_mergepairs parsed_barcodes/reads1.fastq --reverse parsed_barcodes/reads2.fastq --fastqout merged_reads/merged.fastq --fastq_maxdiffs 5
+
+## Filter merged reads 
+## -------------------
+source("R/call_filter_merged_reads_dqb.R")
+
+## Truncate filtered to get only exon sequences
+## --------------------------------------------
+fastx_trimmer -i  merged_reads/merged_filtered.fastq -o merged_reads/merged_filtered_truncated.fastq -f 59 -l 240;
+
+## Run MHC clustering pipeline
+## ---------------------------
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.0' &
+
+## Explore sensitivity to parameter alpha
+## --------------------------------------
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.0' ;
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.5' ;
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.0' ;
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.5' ;
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.0' ;
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.5' ;
+cluster_mhc2.py -f merged_reads/merged_filtered_truncated.fastq -o clustered_reads/alpha_exploration/dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '3.0' ;
+
+## Apply to samples individually, adjust alpha value accordingly to explore parameter space
+## ----------------------------------------------------------------------------------------
+
+cd merged_reads/demultiplexed/
+find . -type d | while read d; do
+   (cd $d/
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.0' ;
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '0.5' ;
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.0' ;
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '1.5' ;
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.0' ;
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '2.5' ;
+   cluster_mhc2.py -f seq.fastq -o dqb -u usearch10.exe -pct '1.0' -minsize '10.0' -alpha '3.0' ;
+   )  
+done
+cd ../
+
+## Create reference based on individually identified otus
+## ------------------------------------------------------
+
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_3.0 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_3.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_2.5 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_2.5_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_2.0 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_2.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_1.5 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_1.5_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_1.0 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_1.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_0.5 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_0.5_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
+cluster_against_db.py -f merged_reads/merged_filtered_truncated.fastq -o reference_based/a_0.0 -ref merged_reads/demultiplexed/dqb_pct_1.0_a_0.0_ee_1.0.fixed.otus.fa_pooled_zotus.fa -u usearch10.exe ;
