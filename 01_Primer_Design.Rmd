@@ -1,0 +1,271 @@
+---
+title: "Designing MHC primers"
+author: "Meinolf Ottensmann"
+bibliography: refs.bib
+output:
+    pdf_document: default
+includes:
+    in_header: \\usepackage[utf8]{inputnc}
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(fig.width = 5, fig.height = 5,tidy = TRUE,
+                      highlight = TRUE,comment = ">", strip.white = TRUE, collapse = TRUE,
+                      warning = FALSE, message = FALSE, fig.align = "center")
+options(width = 50)
+```
+
+## Preface
+
+This document provides the entire workflow for designing target-specific primer pairs that allow the amplification of Major Histocompatibility Complex II loci in *Arctocephalus gazella*. Computations are based on scripts written in `bash`, `phyton` and `R` respectively. Throughout, the working directory of both may be set to the parent folder of this project `SealMHC`, which contains all relevant data in subfolders.
+
+```{r, results = 'hide'}
+library(plyr)
+library(dplyr)
+source("R/primer_functions.R")
+```
+
+## Summary
+
+Based on multiple sequence alignments of Major Histocompatibilty II sequences, the seconds exons of `DQA`, `DQB`, `DRA` and `DRB` have been identified on **Contig48** of the draft Antarctic fur seal genome [@Humble.2016]. Approximate start and end postions of exons are given in table 1. Table 2 shows locus-specific primer sequences.  
+
+```{r, echo=FALSE, results='asis'}
+kable(read.table("documents/locations_mhc_loci.csv", header = T, sep = ","),
+      caption = "Positions of MHC II exons within the Fur seal genome assembly.")
+```
+
+```{r, echo=FALSE, results='asis'}
+knitr::kable(read.table("documents/mhc_primer_sequences.csv", header = T, sep = ","), caption = "Locus-specifc primer for seconds exons MHC II loci in Antarctic fur seals.", col.names = c("Locus","Forward primer","Reverse primer"))
+```
+
+## Exploring the fur seal MHC architecture on the genome and transcriptome level
+
+### Set up NCBI BLAST and databases
+
+```bash
+sudo 
+  apt-get install ncbi-blast+
+makeblastdb
+  -in blast/arc_gaz_genome.fasta -dbtype nucl 
+  -out blast/db/arc_gaz_genome_db
+makeblastdb 
+  -in blast/arc_gaz_transcriptome.fasta -dbtype nucl 
+  -out blast/db/arc_gaz_transcriptome_db
+```
+
+### Blasting sequences against references
+
+Exon II sequences of several carnivores were downloaded from [GenBank](https://www.ncbi.nlm.nih.gov/genbank/) as single fasta files for each of the targeted loci. These files are used to (i) generate sequence alignments and (ii) map the loci to the *A. gazella* genome and transriptome respectively. _Blastn_ results indicate the location of the MHC loci on the genome and the transcriptome and allow to extract the consensus sequences.
+
+```bash
+blastn 
+  -db blast/db/arc_gaz_genome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/dqa.fasta 
+  -out blast/blast_results/dqa2_arc_gaz_genome.fasta
+blastn 
+  -db blast/db/arc_gaz_genome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/dqb.fasta 
+  -out blast/blast_results/dqb2_arc_gaz_genome.fasta
+blastn 
+  -db blast/db/arc_gaz_genome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/drb.fasta 
+  -out blast/blast_results/drb2_arc_gaz_genome.fasta
+blastn 
+  -db blast/db/arc_gaz_genome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/dra.fasta 
+  -out blast/blast_results/dra2_arc_gaz_genome.fasta
+blastn 
+  -db blast/db/arc_gaz_transcriptome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/dqa.fasta 
+  -out blast/blast_results/dqa2_arc_gaz_transcriptome.fasta
+blastn 
+  -db blast/db/arc_gaz_transcriptome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/dqb.fasta 
+  -out blast/blast_results/dqb2_arc_gaz_transcriptome.fasta
+blastn 
+  -db blast/db/arc_gaz_transcriptome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/drb.fasta 
+  -out blast/blast_results/drb2_arc_gaz_transcriptome.fasta
+blastn 
+  -db blast/db/arc_gaz_transcriptome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 1e-8 
+  -word_size 7 
+  -query blast/dra.fasta 
+  -out blast/blast_results/dra2_arc_gaz_transcriptome.fasta
+```
+\newpage
+
+### Extract regions of interest from blast hits
+
+With consideration of a adequate flanking sequences, 150 bp up/downstream, targets for designing primers are extracted based on the estimated start and end positions of the mhc loci. 
+
+```{r, eval = FALSE}
+## list files
+files <- list.files("blast/blast_results",
+                    include.dirs = FALSE,
+                    pattern = "\\.fasta$")
+## extract targets and write to file
+for (i in files) target_extract(file = i, flanking = 150, dir = "blast/blast_results") 
+```
+
+Now, sequences are extracted from the assembled genome and transcriptome respectively, using [bedtools](http://bedtools.readthedocs.io/en/latest/).
+
+```bash
+## to avoid compatibility problems between windows and linux
+dos2unix blast/blast_results/dqa2_arc_gaz_genome.bed
+dos2unix blast/blast_results/dqb2_arc_gaz_genome.bed
+dos2unix blast/blast_results/drb2_arc_gaz_genome.bed
+dos2unix blast/blast_results/dra2_arc_gaz_genome.bed
+
+dos2unix blast/blast_results/dqa2_arc_gaz_transcriptome.bed
+dos2unix blast/blast_results/dqb2_arc_gaz_transcriptome.bed
+dos2unix blast/blast_results/drb2_arc_gaz_transcriptome.bed
+dos2unix blast/blast_results/dra2_arc_gaz_transcriptome.bed
+
+bedtools getfasta 
+  -fi blast/arc_gaz_genome.fasta 
+  -bed blast/blast_results/dqa2_arc_gaz_genome.bed 
+  -fo blast/seq/dqa_arc_gaz_genome.fasta 
+
+bedtools getfasta
+  -fi blast/arc_gaz_genome.fasta 
+  -bed blast/blast_results/dqb2_arc_gaz_genome.bed 
+  -fo blast/seq/dqb_arc_gaz_genome.fasta
+
+bedtools getfasta
+  -fi blast/arc_gaz_genome.fasta 
+  -bed blast/blast_results/drb2_arc_gaz_genome.bed 
+  -fo blast/seq/drb_arc_gaz_genome.fasta
+
+bedtools getfasta
+  -fi blast/arc_gaz_genome.fasta 
+  -bed blast/blast_results/dra2_arc_gaz_genome.bed 
+  -fo blast/seq/dra_arc_gaz_genome.fasta
+
+bedtools getfasta
+  -fi blast/arc_gaz_transcriptome.fasta 
+  -bed blast/blast_results/dqa2_arc_gaz_transcriptome.bed 
+  -fo blast/seq/dqa_arc_gaz_transcriptome.fasta
+
+bedtools getfasta 
+  -fi blast/arc_gaz_transcriptome.fasta 
+  -bed blast/blast_results/dqb2_arc_gaz_transcriptome.bed 
+  -fo blast/seq/dqb_arc_gaz_transcriptome.fasta
+
+bedtools getfasta 
+  -fi blast/arc_gaz_transcriptome.fasta 
+  -bed blast/blast_results/drb2_arc_gaz_transcriptome.bed 
+  -fo blast/seq/drb_arc_gaz_transcriptome.fasta
+
+bedtools getfasta 
+  -fi blast/arc_gaz_transcriptome.fasta 
+  -bed blast/blast_results/dra2_arc_gaz_transcriptome.bed 
+  -fo blast/seq/dra_arc_gaz_transcriptome.fasta
+```
+
+## Design Primers for DQA, DQB, DRA and DRB
+
+Based on the blasting results obtained by the steps outlined above, all putative regions within the genome and transcriptome of *Arctocephalus gazella* were identified and extracted for a multiple-species alignment using `BioEdit`.  
+For each of the loci, contig number and the relative position are listed in the first line. The second line denotes the position of the target region on both the extracted sequences as well as the contig. The third rows gives the coordinates used in [Primer3Plus](http://www.bioinformatics.nl/cgi-bin/primer3plus/primer3plus.cgi) to mark the target for designning primers.
+
+### DQA
+
+* Contig48:1913216-1913961
+* TARGET Region: 247-496 (1913465-1913711)
+* TARGET: 242,256
+
+### DQB
+
+* Contig48:1936819-1937588
+* TARGET Region: 251-520 (1937069-1937338)
+* TARGET: 251,270 OR 244,251
+
+### DRB
+
+* Contig48:2002402-2003098
+* TARGET Region: 169-401 (2002570-2002802)
+* TARGET:163 ,239
+
+### DRA
+
+* Contig48:1737350-1737895
+* TARGET Region: 150-401 (1737500 - 1737751)
+* TARGET:150, 251
+
+
+The following workflows was conducted to calculate primers with the above mentionen tool.
+
+1. Open `Primer3Plus` with the browser.
+2. Paste source sequence from `data/primer_source_seqs.txt` into the designated field.
+3. Specify the target coordinates.
+4. Upload Primer3Plus settings (`data/Primer3Plus-settings.txt`) to customise parameters under `General Settings`
+5. Press the button `activate settings`
+6. Press `pick primers`
+
+*The blasting results suggests a duplication of the `DRA` locus. Primers designed for one position fit to the second region.*
+
+## Check specifity of primers
+
+### Blasting against the genome
+
+Primers sequences are mapped to the genome to ensure specifity for the targeted loci.
+
+```bash
+dos2unix blast/mhc-primer.fasta
+blastn 
+  -db blast/db/arc_gaz_genome_db 
+  -outfmt 6 
+  -num_threads 8 
+  -evalue 10 
+  -word_size 14 
+  -query blast/mhc-primer.fasta 
+  -out blast/blast_results/primer2_arc_gaz_genome.fasta
+```
+
+### Analysing hits
+
+In addition to the targeted regions, primers do fit to multiple regions in the genome, but there not a single pair fits elsewhere in such a way that forward and reverse primer are suggested to anneal within the conservative range of 800 bases.  
+
+```{r, echo=FALSE}
+kable(primer_check(Blast = "blast/blast_results/primer2_arc_gaz_genome.fasta",threshold = 800))
+```
+
+***
+```{r}
+sessionInfo()
+```
+***
+## References
+
+

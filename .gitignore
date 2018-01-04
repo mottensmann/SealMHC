@@ -5,4 +5,12 @@
 data
 notes
 internal
-miseq_reads
+DQB/transcriptome_reads.fasta
+DRB/transcriptome_reads.fasta
+.fastq
+.afa
+bash_scripts
+arc_gaz_genome.fasta
+arc_gaz_transcriptome.fasta
+arc_gaz_genome_db*
+arc_gaz_transcriptome_db*

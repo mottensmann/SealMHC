@@ -1,0 +1,114 @@
+---
+title: "Barcoding primers for pooling multiple individuals"
+author: "Meinolf Ottensmann"
+bibliography: refs.bib
+output:
+    pdf_document: default
+includes:
+    in_header: \\usepackage[utf8]{inputnc}
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(fig.width = 5, fig.height = 5,tidy = TRUE,
+                      highlight = TRUE,comment = ">", strip.white = TRUE, collapse = TRUE,
+                      warning = FALSE, message = FALSE, fig.align = "center")
+options(width = 50)
+```
+
+## Preface
+
+This document provides details on barcoding individual samples using indexed primer pairs. Details on the development of target-specific primer pairs are given in files **01_Primer_Design**.
+
+```{r, results = 'hide', eval= FALSE}
+library(plyr)
+library(dplyr)
+library(seqinr)
+library(rex)
+library(ShortRead)
+```
+
+
+## Assing 82 samples and 6 replicates to 11 rows of a 96-well rack 
+
+All 82 samples (41 mother-pup pairs) are randomly assigned to a location on 96-well rack. Additionally, six replicates are included.
+
+```{r, eval = FALSE}
+# read sample names
+names <- read.csv("data/mhc_sample_names.csv",header = T, sep = ";")
+names <- names[,c("ID","Pair")]
+names <- unique(names)
+row.names(names) <- as.character(1:nrow(names))
+
+# Pseudo-random order of samples
+# Note, this order will change when execute on another computer
+set.seed(99)
+coins <- sample(1:nrow(names),size = nrow(names),replace = F)
+
+# create rack locations
+R <- 1:11
+C <- LETTERS[1:8]
+p <- character()
+for (r in 1:length(R)) {
+  for (c in 1:length(C)) {
+    p <- c(p, paste0(C[c],as.character(R[r])))
+      }
+}
+
+df <- data.frame(id = names[["ID"]][coins], 
+             pair = names[["Pair"]][coins], 
+             no = coins, 
+             pos = p[1:82])
+
+## Last column are replicates
+replicates <- c("W8914mum","W8928pup","W8933pup","W8935mum","W8915pup","AGF11007")
+coins2 <- unlist(lapply(X = replicates,FUN = function(a) which(df[["id"]] == a)))
+
+df2 <- df[coins2,1:3]
+df2[["pos"]] <- p[83:88]
+
+df <- rbind(df,df2)
+df[["age"]] <- unlist(lapply(X = df[["pair"]],FUN = function(a) substring(a, 1,1)))
+df[["pair_id"]] <- unlist(lapply(X = df[["pair"]],FUN = function(a) substring(a, 2)))
+```
+
+## Add barcodes
+
+Index sequences of the Illumina Nextera_XT kit [@Illumina.2017] are used as barcodes. 12 indices may be assigned to each of the rack´s rows, while 8 indices are used for each of the columns. Note, DRB and DQB use slightly different combinations.
+
+```{r, eval=FALSE}
+# read barcodes and assing to forward and reverse
+barcodes <- read.csv2("data/mhc_barcodes.csv",skip = 1)
+f <- barcodes[barcodes[["primer"]] == "Forward",1:2]
+r <- barcodes[barcodes[["primer"]] == "Reverse",1:2]
+
+dqb <- 
+  data.frame(Index_F = rep(f$Index[1:11],each = 8),
+             Index_R = rep(r$Index, 11),
+             Sequence_F = rep(f$Sequence[1:11], each = 8), 
+             Sequence_R = rep(r$Sequence, 11))
+
+drb <-
+  data.frame(Index_F = rep(f$Index[c(1,2,3,4,5,6,7,12,9,10,11)], each = 8), 
+             Index_R = rep(r$Index, 11),
+             Sequence_F = rep(f$Sequence[c(1,2,3,4,5,6,7,12,9,10,11)], each = 8), 
+             Sequence_R = rep(r$Sequence, 11))
+
+df <- df[,c("id","age","pair_id","pos")]
+
+dqb <- cbind(df, dqb)
+drb <- cbind(df, drb)
+
+write.csv(dqb, file = "documents/dqb_table.csv", row.names = F)
+write.csv(dqb, file = "documents/dqa_table.csv", row.names = F)
+write.csv(dqb, file = "documents/dra_table.csv", row.names = F)
+write.csv(drb, file = "documents/drb_table.csv", row.names = F)
+```
+
+***
+```{r}
+sessionInfo()
+```
+***
+
+## References
