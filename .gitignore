@@ -14,3 +14,5 @@ arc_gaz_genome.fasta
 arc_gaz_transcriptome.fasta
 arc_gaz_genome_db*
 arc_gaz_transcriptome_db*
+arc_gaz_genome_alignment.fasta
+.pdf

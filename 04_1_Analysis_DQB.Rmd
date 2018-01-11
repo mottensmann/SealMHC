@@ -459,7 +459,7 @@ length(comb)
 ```
 
 
-## Heritability and repeatibility
+## Replace rack positions by id names 
 
 ```{r}
 ## get mapping file
@@ -481,14 +481,7 @@ dqb_mapping_file$Pair <- paste0(dqb_mapping_file$Pair,"_" , 1:nrow(dqb_mapping_f
 called_alleles_renamed <- called_alleles 
 names(called_alleles_renamed) <- 
   dqb_mapping_file$Pair[match(names(called_alleles),dqb_mapping_file$pos)]
-```
 
-
-## Investigation of low robustness in genotyping
-
-Allelic droput, a bias in amplification efficiency across alleles is known phenomonen at the MHC [@Sommer.2013]. Two replicates reaveal poor repeatabiliy of alleles. For exploration of genotypes, duplicates are randomly removed from the data. 
-
-```{r}
 ## get sample names
 samples <- lapply(names(called_alleles_renamed), function(x) strsplit(x, "_")[[1]][1])
 
@@ -501,6 +494,12 @@ remove <- numeric()
 for (i in 1:length(replicated)) remove[i] <- sample(which(samples == replicated[[i]]), 1)
 
 genotypes_dqb <- called_alleles_renamed[-remove]
+
+## remove name extensions
+names(genotypes_dqb) <- 
+  lapply(names(genotypes_dqb), function(x) strsplit(x, "_")[[1]][1]) %>%
+  unlist()
+
 save(genotypes_dqb, file = "miseq_reads/DQB-Pool/RData/genotypes_dqb.RData")
 ```
 
