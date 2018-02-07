@@ -1,0 +1,239 @@
+---
+title: "Investigating associations between MHC diversity and scent and colony membership"
+author: "Meinolf Ottensmann"
+bibliography: refs.bib
+output:
+    pdf_document: default
+includes:
+    in_header: \\usepackage[utf8]{inputnc}
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(fig.width = 5, fig.height = 5,tidy = FALSE,
+                      highlight = TRUE,comment = ">",strip.white = TRUE,collapse = TRUE,
+                      warning = FALSE, message = FALSE, fig.align = "center")
+options(width = 70)
+```
+
+```{r}
+library(GCalignR)
+library(ggplot2)
+library(magrittr)
+library(vegan)
+library(phyloseq)
+```
+
+## Calculate pairwise UniFrac distances
+
+Pairiwse estimates of MHC similariy are calculated by UniFrac distances derived from a maximum likelihood gene tree that was constructed in MEGA7 and exported as _.nwk_ file.
+
+```{r}
+## load ML tree
+tree <- ape::read.tree(file = "Phylogeny/Trees/nwk/arga_beta_exon.nwk")
+plot(tree, cex = 0.5)
+```
+
+Next, genotypes are loaded and subsetted to individuals that have been successfully genotyped for both loci. Furthermore, this analysis is restricted to individuals that possess only those alleles that were classified as genuine with high confidence (i.e. present in more than one individual).
+
+```{r}
+## load genotypes:
+load("miseq_reads/DQB-Pool/RData/genotypes_dqb.RData")
+load("miseq_reads/DRB-Pool/RData/genotypes_drb.RData")
+
+## find samples in both datasets
+samples <- names(genotypes_dqb)[which(names(genotypes_dqb) %in% names(genotypes_drb))]
+
+## order samples
+genotypes_drb <- genotypes_drb[samples]
+genotypes_dqb <- genotypes_dqb[samples]
+
+## change Zotu to correct allele prefix (i.e. ArGa-DQB and ArGa-DRB)
+for (i in 1:length(genotypes_dqb)) {
+  genotypes_dqb[[i]] <- stringr::str_replace(genotypes_dqb[[i]], "Zotu", "ArGa-DQB*")
+  genotypes_drb[[i]] <- stringr::str_replace(genotypes_drb[[i]], "Zotu", "ArGa-DRB*")
+}
+
+genotypes <- genotypes_drb
+for (i in 1:length(genotypes)) {
+  genotypes[[i]] <- c(genotypes[[i]], genotypes_dqb[[i]])
+}
+
+## remove samples with uncertain alleles
+
+fx <- function(x) any(!(x %in% tree$tip.label))
+remove <- which(!(unlist(lapply(genotypes,fx))) == FALSE)
+
+samples <- samples[-as.numeric(remove)]
+genotypes <- genotypes[-as.numeric(remove)]
+```
+
+
+Now, a matrix of OTUs (= alleles) is constructed in which the presence/absence of alleles within indiviudal samples is coded by 1 and 0 respectively. Samples represent columns and rows are alleles
+
+```{r}
+## get otus = alleles
+otus <-  unique(unlist(genotypes))
+
+## create a matrix of otus, code presence/absence per individual
+otumat <- matrix(0, nrow = length(otus), ncol = length(genotypes))
+rownames(otumat) <- otus
+colnames(otumat) <- names(genotypes)
+for (i in 1:length(genotypes)) {
+  temp <- genotypes[[i]]
+  otumat[which(rownames(otumat) %in% temp),i] <- 1
+}
+## overview
+otumat[1:5, 1:5]
+```
+
+In order to calculate UniFrac distances, a _phseq_ objects needs to be constructed first, in which the gene tree and the OTU table are combined. 
+
+```{r}
+## create physeq object
+physeq <- phyloseq::otu_table(otumat, taxa_are_rows = TRUE)
+physeq <- phyloseq::merge_phyloseq(physeq, tree)
+
+## calculate pairwise unifrac distances
+ufrac <- phyloseq::UniFrac(physeq)
+```
+
+
+Process raw chemical data from [@Stoffel.2015]. As the processing requires considerable execution time, the resulting data are available within this repository. 
+
+```{r}
+## not run
+# load("RData/peak_data.RData")
+# aligned_peak_data <- 
+#   GCalignR::align_chromatograms(data = peak_data,
+#                                 rt_col_name = "time",
+#                                 rt_cutoff_low = 8,
+#                                 blanks = c("C2","C3"),
+#                                 delete_single_peak = T)
+load(file =  "RData/aligned_peak_data.RData")
+
+## normalise
+scent <- 
+  GCalignR::norm_peaks(aligned_peak_data, 
+                    conc_col_name = "area",
+                    rt_col_name = "time",
+                    out = "data.frame") 
+scent <- log(scent + 1) 
+
+## subset data with respect to MHC data
+scent <- scent[match(colnames(otumat), rownames(scent)),]
+
+## calculate distance
+scent_bc <- (as.matrix(vegan::vegdist(as.matrix(scent)), method = "bray")) %>%
+  as.dist()
+```
+
+## Perform statistics
+
+```{r}
+## Mantel test
+vegan::mantel(ydis = ufrac, xdis = scent_bc, method = "spearman", permutation = 9999)
+
+x <- vegan::mantel.correlog(D.geo = ufrac, D.eco =  scent_bc, n.class = 4, r.type = "spearman")
+plot(x)
+```
+
+Load estimates of genome-wide Queller & Goodnight relatedness [@Stoffel.2015] and subset the data with respect to MHC data
+
+```{r}
+microsats <- read.table("data/relatedness_microsats.txt")
+
+# create matrix to store data of interest 
+microsats_sub <- matrix(NA, length(samples), length(samples))
+rownames(microsats_sub) <- colnames(otumat)
+colnames(microsats_sub) <- colnames(otumat)
+## fill with values
+for (r in samples) {
+  for (c in samples) {
+    relatedness <- ifelse(
+      is.na(microsats[which(rownames(microsats) == r),
+                             which(rownames(microsats) == c)]),
+                   microsats[which(rownames(microsats) == c),
+                             which(rownames(microsats) == r)],
+                   microsats[which(rownames(microsats) == r),
+                             which(rownames(microsats) == c)])
+    microsats_sub[r,c] <- relatedness
+  }
+}
+```
+
+Explore relationship betwee UniFrac distances and relatedness. For ease of interpretation relatedness estimates are converted to distances by substracting from 1. 
+
+```{r}
+## Mantel test
+vegan::mantel(ydis = ufrac, xdis = 1 - as.dist(microsats_sub), method = "spearman", permutation = 9999)
+
+x <- vegan::mantel.correlog(D.geo = ufrac, D.eco =  1 - as.dist(microsats_sub), n.class = 4, r.type = "spearman")
+plot(x)
+
+```
+
+## Nonmetric multidimensional scaling (NMDS)
+
+```{r}
+## load and wrangle metadatatata
+load("RData/metadata_scent.RData")
+metadata_scent <- metadata_scent[which(rownames(metadata_scent) %in% rownames(scent)),] 
+metadata_scent$age <- as.factor(metadata_scent$age)
+metadata_scent$age <- factor(metadata_scent$age, labels = c("adult", "pub"))
+metadata_scent$family <- as.factor(metadata_scent$family)
+metadata_scent$ind <- rownames(metadata_scent)
+head(metadata_scent)
+
+## add to physeq object
+sample_data(physeq) <- metadata_scent
+
+sample_data(physeq) <- peak_factors
+ordu = ordinate(physeq, "NMDS", "unifrac")
+p1 <- plot_ordination(physeq, 
+                      ordu, 
+                      color = "colony")
+
+p1 <- p1 +
+  geom_point(size = 4) + 
+  theme_void() + 
+  scale_color_manual(values = c("blue","red")) +
+  theme(panel.background = element_rect(colour = "black", size = 1.25,
+                                        fill = NA),
+        aspect.ratio = 1,
+        legend.position = "b") +
+  geom_line(aes(group = family), size = 0.7, color = "grey10",
+            linetype = "dashed")
+p1
+
+scent_nmds <- vegan::metaMDS(comm = scent, distance = "bray")
+## get x and y coordinates
+scent_nmds <- as.data.frame(scent_nmds[["points"]])  
+## add the colony as a factor to each sample
+scent_nmds <- cbind(scent_nmds, colony = metadata_scent[["colony"]], ind = rownames(metadata_scent), family = metadata_scent[["family"]])
+
+ggplot(data = scent_nmds,aes(MDS1,MDS2,color = colony)) +
+  geom_point() + 
+  theme_void() + 
+  scale_color_manual(values = c("blue","red")) +
+  theme(panel.background = element_rect(colour = "black", size = 1.25,
+                                        fill = NA), aspect.ratio = 1,
+        legend.position = "n") +
+  geom_line(data = scent_nmds, aes(group = family), size = 0.3, color = "grey10")
+```
+
+## Test for colony effect
+
+```{r}
+## colony effect
+vegan::adonis(scent ~ metadata_scent$colony,permutations = 9999) 
+vegan::adonis(ufrac ~ metadata_scent$colony ,permutations = 9999) 
+```
+
+***
+```{r}<
+sessionInfo()
+```
+***
+
+## References

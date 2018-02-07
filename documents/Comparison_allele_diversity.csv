@@ -1,0 +1,33 @@
+﻿Species,DQB,,,,DRB,,,,Reference
+,Individuals,Variants,Length,Loci,Individuals,Variants,Length,Loci,
+Pinnipedia,,,,,,,,,
+California sea lion Zalophus californianus,2,8,270,3,2,11,270,8,"\cite{Bowen.2002,Bowen.2004,Bowen.2006)"
+Galápagos sea lion Zalophus wollebaeki,,,,,506,27,159,1,\cite{Lenz.2013}
+New Zealand seal lion Phocarctos hookeri,87,2,231,1,87,28,229,1,\cite{Osborne.2013}
+Australian sea lion Neophoca cinerea,47,3,214,1,47,8,268,2,\cite{Lau.2015}
+Northern elephant seal Mirounga angustirostris,69,2,141,1,110,2,188,2,"\cite{Hoelzel.1999, Weber.2004}"
+Southern elephant seal Mirounga leonina,109,8,141,1,2,5,188,2,"\cite{Hoelzel.1999, Weber.2004}"
+Antarctic fur seal Arctocephalus gazella,13,4,141,1,,,,,\cite{Hoelzel.1999}
+New Zealand fur seal Arctocephalus gazella,19,4,141,1,,,,,\cite{Hoelzel.1999}
+Grey seal Halichoerus grypus,17,5,234,2,,,,,\cite{Cammen.2011}
+Walrus Odobenus rosmarus,,5,195,1,,,,,\cite{Sonsthagen.2014}
+,,,,,,,,,
+Ursidae,,,,,,,,,
+Asiatic black bear Ursus thibetanus,184,43,267,1,7,3,267,1,"\cite{Goda.2010,  Yasukochi.2012}"
+Brown bear Ursus arctos,26,4,224,2,234,16,192,2,\cite{Kuduk.2010}
+Polar bear Ursus maritimus,98,6,171,2,87,8,186,2,\cite{Weber.2013}
+Giant panda Ailuropoda melanoleuca,121,7,270,2,121,13,270,2,\cite{Chen.2009}
+,,,,,,,,,
+Cetacea,,,,,,,,,
+Fin whale Balaenoptera physalus,36,3,172,1,8,3,213,1,"\cite{Baker.2006,Nigenda-Morales.2007}"
+Humpback whale Megaptera novaeangliae,43,23,172,2,8,7,213,1,\cite{Baker.2006}
+Southern right whale Eubalaena australis,1,5,172,3,8,2,213,1,\cite{Baker.2006}
+Blue whale Balaenoptera musculus,80,22,172,2,,,,,\cite{Moreno-Santillan.2016}
+Finless porpoise Neophocaena phocaenoides,195,14,172,3,,,,,\cite{Xu.2007}
+"Yangtze Finless Porpoise, Neophocaena phocaenoides asiaeorientalis",76,18,172,3,,,,,\cite{Du.2010}
+Beluga whale Delphinapterus leucas,233,5,172,1,,,,,\cite{Murray.1995}
+Narwhal  Monodon monoceros,12,1,172,1,,,,,\cite{Murray.1995}
+Baiji Lipotes vexillifer,18,43,172,4,,,,,\cite{Yang.2005}
+,,,,,,,,,
+Canidae,,,,,,,,,
+Grey wolf Canis lupus,175,19,267,,175,25,270,,\cite{Seddon.2010}
