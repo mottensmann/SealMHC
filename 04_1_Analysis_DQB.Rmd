@@ -642,7 +642,7 @@ plot11_gene_expression
 
 ### Estimating differential amplification efficiencies across alleles
 
-In a study on MHC II DRB in a rodent, Sommer *et al.* [-@Sommer.2013] have shown remarkable variation in the amplfication efficiencies differing by more than magnitude. Based on the read counts per allele across the studied population, 
+In a study on MHC II DRB in a rodent, Sommer *et al.* [-@Sommer.2013] have shown remarkable variation in the amplfication efficiencies differing by more than a magnitude among allele pairs. 
 
 ```{r}
 otu_table_purified <- purify_otus(x = otu_table,
@@ -671,6 +671,8 @@ df <- data.frame(allele = colnames(otu_table),
                  efficiency = efficiency_obs_norm)
 df$allele <- factor(df$allele, levels = paste0("Zotu", 1:nrow(df)))
 
+levels(df$allele) <- gsub("Zotu", "ArGa-DQB*", levels(df$allele))
+
 plot12_amplification_efficiency <-
 ggplot(df, aes(x = allele, y = efficiency)) +
   geom_point() +
@@ -687,7 +689,7 @@ plot12_amplification_efficiency
 ## Allele detection curve
 
 ```{r}
-sample_alleles <- function(data, n = seq(1, length(data),2), bs = 9999) {
+sample_alleles <- function(data, n = seq(1, 50,1), bs = 9999) {
   x <- rep(n, each = bs)
   y <- lapply(x, function(temp) {
     get <- data[sample(x = 1:length(data),
@@ -713,16 +715,15 @@ df <- summary_stats(sampled_alleles_df,
 df$x <- as.numeric(as.character(df$x))
 
 plot13_allele_detection <- ggplot(df, aes(x,y)) +
-  geom_point(col = "darkorange", size = 2) +
-  annotate("point", x = 13, y = 4, colour = "blue") +
-  annotate("text", x = 13, y = 3.5, label = "Hoelzel 1999") +
-    geom_linerange(ymin = df$y - df$sd, ymax = df$y + df$sd) +
+  geom_point(col = "#fc8d62", size = 2) +
+  geom_linerange(ymin = df$y - df$sd, ymax = df$y + df$sd) +
   theme_classic(base_size = 12) +
-  theme(aspect.ratio = 1) +
+  theme(aspect.ratio = 1,
+        axis.title = element_text(size = 16)) +
   xlab("Sample size") +
   ylab("Number of alleles") +
-  scale_x_continuous(breaks = seq(0,length(data),4)) +
-  scale_y_continuous(breaks = seq(0,21,3),
+  scale_x_continuous(breaks = seq(0,50,3)) +
+  scale_y_continuous(breaks = seq(0,21,1),
                      limits = c(0,21))
 plot13_allele_detection
 ```
@@ -733,16 +734,6 @@ plots <- sapply(ls(pattern = "^plot"), get)
 pdf(paste0("miseq_reads/DQB-Pool/figures/","Diagnostics.pdf"))
 silent <- lapply(plots, print)
 dev.off()
-
-for (i in 1:length(plots)) {
-  ggsave(plots[[i]], 
-         filename = paste0("miseq_reads/DQB-Pool/plots/", names(plots)[i], ".tiff"),
-         width = 6,
-         height = 4,
-         units = "in",
-         dpi = 300,
-         device = "tiff")
-}
 ```
 
 

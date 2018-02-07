@@ -37,10 +37,13 @@ plot(tree, cex = 0.5)
 Next, genotypes are loaded and subsetted to individuals that have been successfully genotyped for both loci. Furthermore, this analysis is restricted to individuals that possess only those alleles that were classified as genuine with high confidence (i.e. present in more than one individual).
 
 ```{r}
+x <- "both" # DQB or DRB to analyse only one marker
+
 ## load genotypes:
 load("miseq_reads/DQB-Pool/RData/genotypes_dqb.RData")
 load("miseq_reads/DRB-Pool/RData/genotypes_drb.RData")
 
+if (x == "both") {
 ## find samples in both datasets
 samples <- names(genotypes_dqb)[which(names(genotypes_dqb) %in% names(genotypes_drb))]
 
@@ -57,6 +60,19 @@ for (i in 1:length(genotypes_dqb)) {
 genotypes <- genotypes_drb
 for (i in 1:length(genotypes)) {
   genotypes[[i]] <- c(genotypes[[i]], genotypes_dqb[[i]])
+}
+} else if (x == "DQB") {
+  samples <- names(genotypes_dqb)
+  for (i in 1:length(genotypes_dqb)) {
+  genotypes_dqb[[i]] <- stringr::str_replace(genotypes_dqb[[i]], "Zotu", "ArGa-DQB*")
+  genotypes <- genotypes_dqb
+}
+} else {
+  samples <- names(genotypes_drb)
+  for (i in 1:length(genotypes_drb)) {
+  genotypes_drb[[i]] <- stringr::str_replace(genotypes_drb[[i]], "Zotu", "ArGa-DRB*")
+  genotypes <- genotypes_drb
+  }
 }
 
 ## remove samples with uncertain alleles
@@ -166,9 +182,9 @@ Explore relationship betwee UniFrac distances and relatedness. For ease of inter
 
 ```{r}
 ## Mantel test
-vegan::mantel(ydis = ufrac, xdis = 1 - as.dist(microsats_sub), method = "spearman", permutation = 9999)
+vegan::mantel(ydis = ufrac, xdis = as.dist(microsats_sub), method = "spearman", permutation = 9999)
 
-x <- vegan::mantel.correlog(D.geo = ufrac, D.eco =  1 - as.dist(microsats_sub), n.class = 4, r.type = "spearman")
+x <- vegan::mantel.correlog(D.geo = ufrac, D.eco =  as.dist(microsats_sub), n.class = 4, r.type = "spearman")
 plot(x)
 
 ```

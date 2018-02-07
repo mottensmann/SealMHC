@@ -100,7 +100,7 @@ DensityAmplicon <- function(reads, proba, logOutput) {
                    log = logOutput))
 }
 
-#' Compute the loglikelihood of the dataset (Sommer et al. 2014, S4)
+#' Compute the loglikelihood of the dataset (Sommer et al. 2013, S4)
 #' @param proba: the efficiency values for all alleles.
 #' @param data: the name of the dataset.
 #' @return the loglikelihood of the dataset

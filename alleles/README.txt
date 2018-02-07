@@ -1,0 +1,1 @@
+Putative alleles among 50 (DQB) and 53 (DRB) Antarctic fur seal individuals

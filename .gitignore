@@ -24,3 +24,5 @@ miseq_reads/DQB-Pool/raw reads/reads1.fastq.gz
 miseq_reads/DRB-Pool/raw reads/reads1.fastq.gz
 miseq_reads/DQB-Pool/raw reads/reads2.fastq.gz
 miseq_reads/DRB-Pool/raw reads/reads2.fastq.gz
+miseq_reads/DQB-Pool/plots
+miseq_reads/DRB-Pool/plots
