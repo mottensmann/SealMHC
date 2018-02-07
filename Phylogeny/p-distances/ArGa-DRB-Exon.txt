@@ -1,0 +1,64 @@
+Title: fasta file
+Description
+  Analysis 
+    Analysis ---------------------------- Distance Estimation
+    Scope ------------------------------- Pairs of taxa
+  Estimate Variance
+    Variance Estimation Method ---------- None
+  Substitution Model
+    Substitutions Type ------------------ Amino acid
+    Genetic Code Table ------------------ Standard
+    Model/Method ------------------------ p-distance
+    Substitutions to Include ------------ All
+  Rates and Patterns
+    Rates among Sites ------------------- Uniform rates
+    Pattern among Lineages -------------- Same (Homogeneous)
+  Data Subset to Use
+    Gaps/Missing Data Treatment --------- Pairwise deletion
+  Codons Included ----------------------- 1st+2nd+3rd
+  No. of Sites : 66
+  d : Estimate
+
+Species1;Species2;Distance 
+ArGa-DRB*1;ArGa-DRB*2;0.077
+ArGa-DRB*1;ArGa-DRB*3;0.092
+ArGa-DRB*2;ArGa-DRB*3;0.092
+ArGa-DRB*1;ArGa-DRB*4;0.077
+ArGa-DRB*2;ArGa-DRB*4;0.123
+ArGa-DRB*3;ArGa-DRB*4;0.092
+ArGa-DRB*1;ArGa-DRB*5;0.046
+ArGa-DRB*2;ArGa-DRB*5;0.092
+ArGa-DRB*3;ArGa-DRB*5;0.108
+ArGa-DRB*4;ArGa-DRB*5;0.062
+ArGa-DRB*1;ArGa-DRB*6;0.062
+ArGa-DRB*2;ArGa-DRB*6;0.046
+ArGa-DRB*3;ArGa-DRB*6;0.092
+ArGa-DRB*4;ArGa-DRB*6;0.108
+ArGa-DRB*5;ArGa-DRB*6;0.077
+ArGa-DRB*1;ArGa-DRB*7;0.031
+ArGa-DRB*2;ArGa-DRB*7;0.077
+ArGa-DRB*3;ArGa-DRB*7;0.077
+ArGa-DRB*4;ArGa-DRB*7;0.092
+ArGa-DRB*5;ArGa-DRB*7;0.062
+ArGa-DRB*6;ArGa-DRB*7;0.046
+ArGa-DRB*1;ArGa-DRB*8;0.046
+ArGa-DRB*2;ArGa-DRB*8;0.092
+ArGa-DRB*3;ArGa-DRB*8;0.108
+ArGa-DRB*4;ArGa-DRB*8;0.108
+ArGa-DRB*5;ArGa-DRB*8;0.077
+ArGa-DRB*6;ArGa-DRB*8;0.046
+ArGa-DRB*7;ArGa-DRB*8;0.031
+ArGa-DRB*1;ArGa-DRB*10;0.046
+ArGa-DRB*2;ArGa-DRB*10;0.062
+ArGa-DRB*3;ArGa-DRB*10;0.077
+ArGa-DRB*4;ArGa-DRB*10;0.092
+ArGa-DRB*5;ArGa-DRB*10;0.077
+ArGa-DRB*6;ArGa-DRB*10;0.015
+ArGa-DRB*7;ArGa-DRB*10;0.031
+ArGa-DRB*8;ArGa-DRB*10;0.031
+Table. Estimates of Evolutionary Divergence between Sequences 
+The number of amino acid differences per site from between sequences are shown. The analysis involved 9 amino acid sequences. The coding data was translated assuming a Standard genetic code table. All ambiguous positions were removed for each sequence pair. There were a total of 66 positions in the final dataset. Evolutionary analyses were conducted in MEGA7 [1]. 
+
+
+1. Kumar S., Stecher G., and Tamura K. (2016). MEGA7: Molecular Evolutionary Genetics Analysis version 7.0 for bigger datasets.Molecular Biology and Evolution 33:1870-1874.
+Disclaimer: Although utmost care has been taken to ensure the correctness of the caption, the caption text is provided "as is" without any warranty of any kind. Authors advise the user to carefully check the caption prior to its use for any purpose and report any errors or problems to the authors immediately (www.megasoftware.net). In no event shall the authors and their employers be liable for any damages, including but not limited to special, consequential, or other damages. Authors specifically disclaim all other warranties expressed or implied, including but not limited to the determination of suitability of this caption text for a specific purpose, use, or application. 

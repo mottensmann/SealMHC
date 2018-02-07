@@ -1,0 +1,93 @@
+---
+title: "Comparison allelic diversity DQB and DRB"
+author: "Meinolf Ottensmann"
+bibliography: refs.bib
+output:
+    pdf_document: default
+includes:
+    in_header: \\usepackage[utf8]{inputnc}
+---
+
+```{r, echo = FALSE}
+library(knitr)
+knitr::opts_chunk$set(fig.width = 5, fig.height = 5,tidy = FALSE,
+                      highlight = TRUE,comment = ">",strip.white = TRUE,collapse = TRUE,
+                      warning = FALSE, message = FALSE, fig.align = "center")
+options(width = 70)
+```
+
+```{r}
+library(magrittr)
+library(ggplot2)
+```
+
+
+## Comparison of nucleotide diversity using p-distances
+
+```{r}
+dqb_exon <- read.table("Phylogeny/p-distances/ArGa-DQB-Exon.txt",
+                       skip = 21, sep = ";", nrows = 153, header = T)[["Distance"]]
+  as.numeric()
+
+drb_exon <- read.table("Phylogeny/p-distances/ArGa-DRB-Exon.txt",
+                       skip = 21, sep = ";", nrows = 36, header = T)[["Distance"]]
+
+t.test(dqb_exon, drb_exon)
+
+dqb_PBR <- read.table("Phylogeny/p-distances/ArGa-DQB-PBR.txt",
+                       skip = 21, sep = ";", nrows = 153, header = T)[["Distance"]]
+
+drb_PBR <- read.table("Phylogeny/p-distances/ArGa-DRB-PBR.txt",
+                       skip = 21, sep = ";", nrows = 36, header = T)[["Distance"]]
+
+t.test(dqb_PBR, drb_PBR)
+
+dqb_nonPBR <- read.table("Phylogeny/p-distances/ArGa-DQB-non-PBR.txt",
+                       skip = 21, sep = ";", nrows = 153, header = T)[["Distance"]]
+
+drb_nonPBR <- read.table("Phylogeny/p-distances/ArGa-DRB-non-PBR.txt",
+                       skip = 21, sep = ";", nrows = 36, header = T)[["Distance"]]
+
+t.test(dqb_nonPBR, drb_nonPBR)
+
+
+```
+
+```{r}
+###
+df <- data.frame(
+  locus = rep(c("DQB", "DRB"), each = 6),
+  sub_rate = c(0.44, 0.89, 0.23, 0.05, 0.01, 0.07,
+         0.16,0.41,0.04,0.04,0,0),
+  se = c(0.01, 0.07, 0.02, 0.01, 0.01, 0.01,
+         0.01, 0.03, 0.01, 0.01, 0, 0),
+  unit = rep(c("Exon", "PBR", "non-PBR"), 4),
+  sub_type = rep(rep(c("dN","dS"), each = 3),2)
+  
+)
+
+
+library(ggplot2)
+p <- ggplot(df, aes(x = locus, y = sub_rate, fill = sub_type)) + 
+  geom_bar(stat = "identity", color = "black", 
+           position = position_dodge()) +
+  geom_errorbar(aes(ymin = sub_rate - se, ymax = sub_rate + se), width = .2,
+                position = position_dodge(.9)) +
+  theme_classic(base_size = 18) +
+  theme(legend.title = element_blank(),
+        legend.position = "n") +
+  scale_y_continuous(expand = c(0,0),
+                     breaks = seq(0,1,0.2),
+                     limits = c(0,1)) +
+  labs(title = "", x = "Locus", y = "Number of substitutions per site") +
+  facet_wrap(~unit)
+p
+```
+
+
+***
+```{r}
+sessionInfo()
+```
+***
+

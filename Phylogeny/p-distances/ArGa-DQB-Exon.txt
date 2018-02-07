@@ -1,0 +1,181 @@
+Title: fasta file
+Description
+  Analysis 
+    Analysis ---------------------------- Distance Estimation
+    Scope ------------------------------- Pairs of taxa
+  Estimate Variance
+    Variance Estimation Method ---------- None
+  Substitution Model
+    Substitutions Type ------------------ Amino acid
+    Genetic Code Table ------------------ Standard
+    Model/Method ------------------------ p-distance
+    Substitutions to Include ------------ All
+  Rates and Patterns
+    Rates among Sites ------------------- Uniform rates
+    Pattern among Lineages -------------- Same (Homogeneous)
+  Data Subset to Use
+    Gaps/Missing Data Treatment --------- Pairwise deletion
+  Codons Included ----------------------- 1st+2nd+3rd
+  No. of Sites : 60
+  d : Estimate
+
+Species1;Species2;Distance   
+ArGa-DQB*1;ArGa-DQB*2;0.133
+ArGa-DQB*1;ArGa-DQB*3;0.033
+ArGa-DQB*2;ArGa-DQB*3;0.150
+ArGa-DQB*1;ArGa-DQB*4;0.117
+ArGa-DQB*2;ArGa-DQB*4;0.100
+ArGa-DQB*3;ArGa-DQB*4;0.100
+ArGa-DQB*1;ArGa-DQB*5;0.083
+ArGa-DQB*2;ArGa-DQB*5;0.117
+ArGa-DQB*3;ArGa-DQB*5;0.117
+ArGa-DQB*4;ArGa-DQB*5;0.117
+ArGa-DQB*1;ArGa-DQB*6;0.150
+ArGa-DQB*2;ArGa-DQB*6;0.133
+ArGa-DQB*3;ArGa-DQB*6;0.183
+ArGa-DQB*4;ArGa-DQB*6;0.150
+ArGa-DQB*5;ArGa-DQB*6;0.117
+ArGa-DQB*1;ArGa-DQB*7;0.167
+ArGa-DQB*2;ArGa-DQB*7;0.133
+ArGa-DQB*3;ArGa-DQB*7;0.183
+ArGa-DQB*4;ArGa-DQB*7;0.117
+ArGa-DQB*5;ArGa-DQB*7;0.133
+ArGa-DQB*6;ArGa-DQB*7;0.117
+ArGa-DQB*1;ArGa-DQB*8;0.017
+ArGa-DQB*2;ArGa-DQB*8;0.133
+ArGa-DQB*3;ArGa-DQB*8;0.050
+ArGa-DQB*4;ArGa-DQB*8;0.133
+ArGa-DQB*5;ArGa-DQB*8;0.067
+ArGa-DQB*6;ArGa-DQB*8;0.150
+ArGa-DQB*7;ArGa-DQB*8;0.167
+ArGa-DQB*1;ArGa-DQB*9;0.133
+ArGa-DQB*2;ArGa-DQB*9;0.100
+ArGa-DQB*3;ArGa-DQB*9;0.133
+ArGa-DQB*4;ArGa-DQB*9;0.067
+ArGa-DQB*5;ArGa-DQB*9;0.083
+ArGa-DQB*6;ArGa-DQB*9;0.133
+ArGa-DQB*7;ArGa-DQB*9;0.083
+ArGa-DQB*8;ArGa-DQB*9;0.117
+ArGa-DQB*1;ArGa-DQB*10;0.033
+ArGa-DQB*2;ArGa-DQB*10;0.133
+ArGa-DQB*3;ArGa-DQB*10;0.067
+ArGa-DQB*4;ArGa-DQB*10;0.117
+ArGa-DQB*5;ArGa-DQB*10;0.050
+ArGa-DQB*6;ArGa-DQB*10;0.150
+ArGa-DQB*7;ArGa-DQB*10;0.167
+ArGa-DQB*8;ArGa-DQB*10;0.050
+ArGa-DQB*9;ArGa-DQB*10;0.133
+ArGa-DQB*1;ArGa-DQB*11;0.083
+ArGa-DQB*2;ArGa-DQB*11;0.100
+ArGa-DQB*3;ArGa-DQB*11;0.100
+ArGa-DQB*4;ArGa-DQB*11;0.083
+ArGa-DQB*5;ArGa-DQB*11;0.033
+ArGa-DQB*6;ArGa-DQB*11;0.133
+ArGa-DQB*7;ArGa-DQB*11;0.117
+ArGa-DQB*8;ArGa-DQB*11;0.100
+ArGa-DQB*9;ArGa-DQB*11;0.083
+ArGa-DQB*10;ArGa-DQB*11;0.050
+ArGa-DQB*1;ArGa-DQB*12;0.083
+ArGa-DQB*2;ArGa-DQB*12;0.117
+ArGa-DQB*3;ArGa-DQB*12;0.083
+ArGa-DQB*4;ArGa-DQB*12;0.083
+ArGa-DQB*5;ArGa-DQB*12;0.033
+ArGa-DQB*6;ArGa-DQB*12;0.117
+ArGa-DQB*7;ArGa-DQB*12;0.133
+ArGa-DQB*8;ArGa-DQB*12;0.067
+ArGa-DQB*9;ArGa-DQB*12;0.067
+ArGa-DQB*10;ArGa-DQB*12;0.083
+ArGa-DQB*11;ArGa-DQB*12;0.067
+ArGa-DQB*1;ArGa-DQB*13;0.133
+ArGa-DQB*2;ArGa-DQB*13;0.100
+ArGa-DQB*3;ArGa-DQB*13;0.133
+ArGa-DQB*4;ArGa-DQB*13;0.033
+ArGa-DQB*5;ArGa-DQB*13;0.100
+ArGa-DQB*6;ArGa-DQB*13;0.150
+ArGa-DQB*7;ArGa-DQB*13;0.117
+ArGa-DQB*8;ArGa-DQB*13;0.117
+ArGa-DQB*9;ArGa-DQB*13;0.033
+ArGa-DQB*10;ArGa-DQB*13;0.133
+ArGa-DQB*11;ArGa-DQB*13;0.100
+ArGa-DQB*12;ArGa-DQB*13;0.083
+ArGa-DQB*1;ArGa-DQB*14;0.117
+ArGa-DQB*2;ArGa-DQB*14;0.117
+ArGa-DQB*3;ArGa-DQB*14;0.100
+ArGa-DQB*4;ArGa-DQB*14;0.033
+ArGa-DQB*5;ArGa-DQB*14;0.117
+ArGa-DQB*6;ArGa-DQB*14;0.150
+ArGa-DQB*7;ArGa-DQB*14;0.100
+ArGa-DQB*8;ArGa-DQB*14;0.133
+ArGa-DQB*9;ArGa-DQB*14;0.083
+ArGa-DQB*10;ArGa-DQB*14;0.117
+ArGa-DQB*11;ArGa-DQB*14;0.083
+ArGa-DQB*12;ArGa-DQB*14;0.083
+ArGa-DQB*13;ArGa-DQB*14;0.067
+ArGa-DQB*1;ArGa-DQB*16;0.133
+ArGa-DQB*2;ArGa-DQB*16;0.050
+ArGa-DQB*3;ArGa-DQB*16;0.150
+ArGa-DQB*4;ArGa-DQB*16;0.117
+ArGa-DQB*5;ArGa-DQB*16;0.083
+ArGa-DQB*6;ArGa-DQB*16;0.133
+ArGa-DQB*7;ArGa-DQB*16;0.133
+ArGa-DQB*8;ArGa-DQB*16;0.150
+ArGa-DQB*9;ArGa-DQB*16;0.100
+ArGa-DQB*10;ArGa-DQB*16;0.100
+ArGa-DQB*11;ArGa-DQB*16;0.050
+ArGa-DQB*12;ArGa-DQB*16;0.117
+ArGa-DQB*13;ArGa-DQB*16;0.133
+ArGa-DQB*14;ArGa-DQB*16;0.133
+ArGa-DQB*1;ArGa-DQB*17;0.150
+ArGa-DQB*2;ArGa-DQB*17;0.150
+ArGa-DQB*3;ArGa-DQB*17;0.150
+ArGa-DQB*4;ArGa-DQB*17;0.067
+ArGa-DQB*5;ArGa-DQB*17;0.133
+ArGa-DQB*6;ArGa-DQB*17;0.117
+ArGa-DQB*7;ArGa-DQB*17;0.083
+ArGa-DQB*8;ArGa-DQB*17;0.150
+ArGa-DQB*9;ArGa-DQB*17;0.117
+ArGa-DQB*10;ArGa-DQB*17;0.150
+ArGa-DQB*11;ArGa-DQB*17;0.150
+ArGa-DQB*12;ArGa-DQB*17;0.100
+ArGa-DQB*13;ArGa-DQB*17;0.083
+ArGa-DQB*14;ArGa-DQB*17;0.067
+ArGa-DQB*16;ArGa-DQB*17;0.183
+ArGa-DQB*1;ArGa-DQB*18;0.150
+ArGa-DQB*2;ArGa-DQB*18;0.150
+ArGa-DQB*3;ArGa-DQB*18;0.167
+ArGa-DQB*4;ArGa-DQB*18;0.083
+ArGa-DQB*5;ArGa-DQB*18;0.133
+ArGa-DQB*6;ArGa-DQB*18;0.117
+ArGa-DQB*7;ArGa-DQB*18;0.083
+ArGa-DQB*8;ArGa-DQB*18;0.150
+ArGa-DQB*9;ArGa-DQB*18;0.100
+ArGa-DQB*10;ArGa-DQB*18;0.150
+ArGa-DQB*11;ArGa-DQB*18;0.150
+ArGa-DQB*12;ArGa-DQB*18;0.117
+ArGa-DQB*13;ArGa-DQB*18;0.067
+ArGa-DQB*14;ArGa-DQB*18;0.083
+ArGa-DQB*16;ArGa-DQB*18;0.183
+ArGa-DQB*17;ArGa-DQB*18;0.017
+ArGa-DQB*1;ArGa-DQB*19;0.067
+ArGa-DQB*2;ArGa-DQB*19;0.117
+ArGa-DQB*3;ArGa-DQB*19;0.100
+ArGa-DQB*4;ArGa-DQB*19;0.100
+ArGa-DQB*5;ArGa-DQB*19;0.017
+ArGa-DQB*6;ArGa-DQB*19;0.117
+ArGa-DQB*7;ArGa-DQB*19;0.133
+ArGa-DQB*8;ArGa-DQB*19;0.083
+ArGa-DQB*9;ArGa-DQB*19;0.100
+ArGa-DQB*10;ArGa-DQB*19;0.033
+ArGa-DQB*11;ArGa-DQB*19;0.017
+ArGa-DQB*12;ArGa-DQB*19;0.050
+ArGa-DQB*13;ArGa-DQB*19;0.117
+ArGa-DQB*14;ArGa-DQB*19;0.100
+ArGa-DQB*16;ArGa-DQB*19;0.067
+ArGa-DQB*17;ArGa-DQB*19;0.133
+ArGa-DQB*18;ArGa-DQB*19;0.133
+Table. Estimates of Evolutionary Divergence between Sequences 
+The number of amino acid differences per site from between sequences are shown. The analysis involved 18 amino acid sequences. The coding data was translated assuming a Standard genetic code table. All ambiguous positions were removed for each sequence pair. There were a total of 60 positions in the final dataset. Evolutionary analyses were conducted in MEGA7 [1]. 
+
+
+1. Kumar S., Stecher G., and Tamura K. (2016). MEGA7: Molecular Evolutionary Genetics Analysis version 7.0 for bigger datasets.Molecular Biology and Evolution 33:1870-1874.
+Disclaimer: Although utmost care has been taken to ensure the correctness of the caption, the caption text is provided "as is" without any warranty of any kind. Authors advise the user to carefully check the caption prior to its use for any purpose and report any errors or problems to the authors immediately (www.megasoftware.net). In no event shall the authors and their employers be liable for any damages, including but not limited to special, consequential, or other damages. Authors specifically disclaim all other warranties expressed or implied, including but not limited to the determination of suitability of this caption text for a specific purpose, use, or application. 
