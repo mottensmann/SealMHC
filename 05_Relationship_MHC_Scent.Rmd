@@ -37,7 +37,7 @@ plot(tree, cex = 0.5)
 Next, genotypes are loaded and subsetted to individuals that have been successfully genotyped for both loci. Furthermore, this analysis is restricted to individuals that possess only those alleles that were classified as genuine with high confidence (i.e. present in more than one individual).
 
 ```{r}
-x <- "both" # DQB or DRB to analyse only one marker
+x <- "DQB" # DQB or DRB to analyse only one marker
 
 ## load genotypes:
 load("miseq_reads/DQB-Pool/RData/genotypes_dqb.RData")
