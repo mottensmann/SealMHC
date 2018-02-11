@@ -16,3 +16,11 @@ In order to to repeat the clustering of Illumina MiSeq reads the pipeline [mhc_c
 ### Raw data
 
 *File sizes of raw sequence data are too large to integrate them within this repository*
+
+#### Fur seal transcriptome assembly
+* [Download](http://ramadda.nerc-bas.ac.uk/repository/entry/show/Polar+Data+Centre/NERC-BAS+Datasets/Genomics/Transcriptomes/Arctocephalus_gazella?entryid=synth%3A2d2268fe-907c-45b0-a493-0a6cab8642e6%3AL1RyYW5zY3JpcHRvbWVzL0FyY3RvY2VwaGFsdXNfZ2F6ZWxsYQ%3D%3D) and save as "blast/arc_gaz_transcriptome.fasta"
+
+#### Fur seal genome assembly
+* [Download](http://datadryad.org/resource/doi:10.5061/dryad.8kn8c) and save as "blast/arc_gaz_genome.fasta"
+
+* Raw DQB/DRB forward and reverse reads are available upon request
