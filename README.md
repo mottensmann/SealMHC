@@ -1,7 +1,7 @@
 # `SealMHC`
 
 **Major histocompatibility complex characterisation in Antarctic fur seals** 
-_(Work in Progress)_
+_(Master´s project)_
 
 ___
 
